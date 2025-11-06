@@ -4,8 +4,8 @@
             <div class="floor">
                 <div class="queue">
                     <div class="updownButton">
-                        <p class="up">Up</p>
-                        <p class="down">Down</p>
+                        <p class="up" v-if="floor != elevator.floorCount" @click="elevator.addQueue(floor, 'up')">Up</p>
+                        <p class="down" v-if="floor != 1" @click="elevator.addQueue(floor, 'down')">Down</p>
                     </div>
                 </div>
                 <div class="door">
