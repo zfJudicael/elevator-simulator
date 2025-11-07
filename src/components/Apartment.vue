@@ -2,87 +2,75 @@
     <div class="apartment">
         <template v-for="floor in elevator.floorCount">
             <div class="floor">
-                <div class="queue">
-                    <div class="updownButton">
-                        <p class="up" v-if="floor != elevator.floorCount" @click="elevator.addQueue(floor, 'up')">Up</p>
-                        <p class="down" v-if="floor != 1" @click="elevator.addQueue(floor, 'down')">Down</p>
-                    </div>
-                </div>
-                <div class="door">
-                    <div class="left" 
-                    :class="{
-                        active : isElevatorOnFloor(floor), 
-                        open: elevator.isDoorOpened && isElevatorOnFloor(floor) 
-                    }"
-                    ></div>
-                    <div class="right" 
-                    :class="{
-                        active : isElevatorOnFloor(floor), 
-                        open: elevator.isDoorOpened && isElevatorOnFloor(floor)
-                    }"
-                    ></div>
+                <p class="title">Floor {{ floor }}</p>
+                <div class="updownButton">
+                    <i :class="{
+                            'pi pi-arrow-up btn' : true,
+                            'hide': floor == elevator.floorCount 
+                        }"
+                        @click="elevator.addClient(floor)">
+                    </i>
+                    <i :class="{
+                            'pi pi-arrow-down btn': true,
+                            'hide': floor == 1
+                        }"
+                        @click="elevator.addClient(floor, false)">
+                    </i>
                 </div>
             </div>
             <div class="separator" v-if="floor != elevator.floorCount"></div>
         </template>
+        <Elevator />
     </div>
 </template>
 
 <script setup lang="ts">
-import { Elevator } from '@/model/Elevator';
+import { useElevatorStore } from '@/stores/elevator';
+import Elevator from './Elevator.vue';
 
-const props = defineProps({
-    elevator: {
-        type : Elevator,
-        required: true
-    }
-})
+const elevator = useElevatorStore();
 
 const isElevatorOnFloor = (floor: number)=>{
-    return props.elevator.elevatorPosition == floor
+    return elevator.elevatorPosition == floor
 }
 </script>
 
 <style lang="scss">
 .apartment{
-    border: 2px solid grey;
-    border-radius: 5px;
-    padding: 5px;
     display: flex;
     flex-direction: column-reverse;
-    
+    background-color: #F5F7FA;
+    border-radius: 15px;
+    position: relative;
+
     .floor{
-        height: 130px;
+        height: 100px;
         display: flex;
+        align-items: center;
+        padding-right: calc(15% + 20px);
+        padding-left: 20px;
+        justify-content: space-between;
 
-
-        .queue{
-            width: 80%;
-
-            .updownButton{
+        .title{
+            font-size: 1.2rem;
+        }
+        .updownButton{
+            display: flex;
+            gap: 10px;
+            justify-content: start;
+            .btn {
+                font-size: 1rem;
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid grey;
+                color: grey;
                 display: flex;
-                gap: 1px;
-
-                .up, .down{
-                    padding: 5px 10px;
-                    border-radius: 5px;
-                    color: white;
-
-                    &:hover{
-                        cursor: pointer;
-                    }
-                }
-
-                .up{
-                    background-color: green;
-                }
-
-                .down{
-                    background-color: blue;
-                }
+                align-items: center;
+            }
+            .hide{
+                visibility: hidden;
             }
         }
-
         .door{
             width: 20%;
             height: 100%;
@@ -124,7 +112,8 @@ const isElevatorOnFloor = (floor: number)=>{
 
     .separator{
         padding: 1px;
-        background-color: grey;
+        background-color: white;
+        z-index: 1;
     }
 }
 
