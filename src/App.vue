@@ -4,7 +4,7 @@
     <main>
       <Controller />
 
-      <Apartment :elevator="elevator1"/>
+      <Apartment />
     </main>
   </div>
 </template>
@@ -12,30 +12,16 @@
 <script setup lang="ts">
 import Controller from './components/Controller.vue';
 import Apartment from './components/Apartment.vue';
-import { Elevator } from './model/Elevator';
-import { ref } from 'vue';
-
-const elevator1 = ref<Elevator>(new Elevator({
-  floorCount: 5,
-  elevatorPosition: 1,
-  currentDirection: "idle",
-  isDoorOpened: false,
-  isMoving: false,
-  upQueue: [],
-  downQueue: []
-}))
-
-
 </script>
 
 <style lang="scss">
 main{
   display: flex;
-  gap: 5px;
+  gap: 20px;
+  padding: 20px;
 
   .controller{
     width: 25%;
-    background-color: grey;
   }
 
   .apartment{
