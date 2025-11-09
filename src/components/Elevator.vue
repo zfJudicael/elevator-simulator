@@ -26,7 +26,7 @@ import { computed } from 'vue';
 const useElevator = useElevatorStore();
 
 const durationMove = computed(() => {
-    const floorDiff = Math.abs((useElevator.nextPosition ?? useElevator.elevatorPosition) - useElevator.lastPosition);
+    const floorDiff = Math.abs((useElevator.nextPosition ?? useElevator.elevatorPosition) - useElevator.elevatorPosition);
     return floorDiff * 0.6;
 });
 

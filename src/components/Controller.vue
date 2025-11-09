@@ -6,6 +6,15 @@ function newDestination(floor: number){
     useElevator.addDestination(floor);
 }
 
+const disabledButton = (floor: number)=>{
+    return (
+        useElevator.isMoving ||
+        useElevator.elevatorPosition === floor ||
+        !useElevator.isDoorOpened ||
+        (useElevator.currentDirection === 'up' && floor < useElevator.elevatorPosition) ||
+        (useElevator.currentDirection === 'down' && floor > useElevator.elevatorPosition));
+}
+
 </script>
 
 <template>
@@ -19,8 +28,8 @@ function newDestination(floor: number){
                 <button 
                     v-for="floor in useElevator.floorCount"
                     @key="floor"
-                    :class="{ not_disabled: !useElevator.isMoving }" 
-                    :disabled="useElevator.isMoving"
+                    :class="{ not_disabled: !disabledButton(floor) }" 
+                    :disabled="disabledButton(floor)"
                     @click="newDestination(floor)"
                 >
                     {{ floor }}

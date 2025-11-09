@@ -29,12 +29,18 @@ export const useElevatorStore = defineStore('elevator', {
     }),
     actions: {
         addClient(floor: number, upDirection = true) {
-            const targetList = upDirection ? this.upClient : this.downClient;
-            if (!targetList.includes(floor)) {
-                targetList.push(floor);
-                this.sortFloors(targetList, upDirection);
+            if(floor === this.elevatorPosition && this.currentDirection === "idle") {
+                this.isDoorOpened = true;
+                this.currentDirection = upDirection ? "up" : "down";
             }
-            if(!this.isDoorOpened) this.setNextPosition();
+            else {
+                const targetList = upDirection ? this.upClient : this.downClient;
+                if (!targetList.includes(floor)) {
+                    targetList.push(floor);
+                    this.sortFloors(targetList, upDirection);
+                }
+                if(!this.isDoorOpened) this.setNextPosition();
+            }
         },
 
         addDestination(floor: number) {
@@ -42,7 +48,7 @@ export const useElevatorStore = defineStore('elevator', {
                 this.destinations.push(floor);
                 this.sortFloors(this.destinations, floor > this.elevatorPosition);
             }
-            if(!this.isDoorOpened) this.setNextPosition();
+            if(this.isDoorOpened) this.setNextPosition();
         },
 
         sortFloors(list: number[], ascending: boolean) {
@@ -50,6 +56,17 @@ export const useElevatorStore = defineStore('elevator', {
         },
 
         setNextPosition() {
+            if(this.isDoorOpened){
+                this.isDoorOpened = false;
+                setTimeout(() => {
+                    this.calculNextPosition();
+                }, 1000);
+            } else {
+                this.calculNextPosition();
+            }
+        },
+
+        calculNextPosition() {
             if (this.isIdle()) {
                 this.currentDirection = "idle";
                 this.nextPosition = null;
@@ -61,7 +78,7 @@ export const useElevatorStore = defineStore('elevator', {
                 this.nextPosition = this.findClosestFloor(candidates);
             } else {
                 this.switchDirection();
-                this.setNextPosition();
+                this.calculNextPosition();
             }
         },
 
@@ -82,8 +99,15 @@ export const useElevatorStore = defineStore('elevator', {
                 return [...this.destinations, ...this.downClient].filter(
                     (floor) => floor < this.elevatorPosition
                 );
+            } else {
+                if(this.upClient.length > 0) {
+                    this.currentDirection = "up";
+                    return this.upClient;
+                } else {
+                    this.currentDirection = "down";
+                    return this.downClient;
+                }
             }
-            return [];
         },
 
         findClosestFloor(candidates: number[]): number {
@@ -94,7 +118,7 @@ export const useElevatorStore = defineStore('elevator', {
 
         switchDirection() {
             this.currentDirection =
-                this.currentDirection === "up" ? "down" : "up";
+                this.currentDirection === "up" || this.currentDirection === "idle" ? "down" : "up";
         },
 
         onMoving(position: number) { 
@@ -108,33 +132,40 @@ export const useElevatorStore = defineStore('elevator', {
         },
 
         onArriveDestination() {
+            let closeAuto = true;
             this.destinations = this.destinations.filter(
                 (floor) => floor !== this.elevatorPosition
             );
             if (this.currentDirection === "up") {
+                if(this.upClient.includes(this.elevatorPosition)){
+                    closeAuto = false;
+                }
                 this.upClient = this.upClient.filter(
                     (floor) => floor !== this.elevatorPosition
                 );
             } else {
+                if(this.downClient.includes(this.elevatorPosition)){
+                    closeAuto = false;
+                }
                 this.downClient = this.downClient.filter(
                     (floor) => floor !== this.elevatorPosition
                 );
             }
             this.lastPosition = this.elevatorPosition;
             this.isMoving = false;
-            this.openDoor();
+            this.openDoor(closeAuto);
         },
         
-        openDoor(){
+        openDoor(closeAuto: boolean) {
             setTimeout(() => {
                 this.isDoorOpened = true
             }, 1000);
-            setTimeout(()=>{
-                this.isDoorOpened = false
-                setTimeout(() => {
-                    this.setNextPosition();
-                }, 1000);
-            }, 4000)
+
+            if(closeAuto){
+                setTimeout(()=>{
+                    this.setNextPosition()
+                }, 3000)
+            }
         },
     },
 });
