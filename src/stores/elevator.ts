@@ -12,6 +12,7 @@ interface Elevator {
     upClient: number[];
     downClient: number[];
     destinations: number[];
+    clientsTransported: number;
 }
 
 export const useElevatorStore = defineStore('elevator', {
@@ -26,6 +27,7 @@ export const useElevatorStore = defineStore('elevator', {
         upClient: [],
         downClient: [],
         destinations: [],
+        clientsTransported: 0,
     }),
     actions: {
         addClient(floor: number, upDirection = true) {
@@ -44,10 +46,8 @@ export const useElevatorStore = defineStore('elevator', {
         },
 
         addDestination(floor: number) {
-            if (!this.destinations.includes(floor)) {
-                this.destinations.push(floor);
-                this.sortFloors(this.destinations, floor > this.elevatorPosition);
-            }
+            this.destinations.push(floor);
+            this.sortFloors(this.destinations, floor > this.elevatorPosition);
             if(this.isDoorOpened) this.setNextPosition();
         },
 
@@ -133,6 +133,9 @@ export const useElevatorStore = defineStore('elevator', {
 
         onArriveDestination() {
             let closeAuto = true;
+            this.clientsTransported += this.destinations.filter(
+                (floor) => floor === this.elevatorPosition
+            ).length; 
             this.destinations = this.destinations.filter(
                 (floor) => floor !== this.elevatorPosition
             );
