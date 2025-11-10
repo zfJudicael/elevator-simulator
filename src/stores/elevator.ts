@@ -41,7 +41,7 @@ export const useElevatorStore = defineStore('elevator', {
                     targetList.push(floor);
                     this.sortFloors(targetList, upDirection);
                 }
-                if(!this.isDoorOpened) this.setNextPosition();
+                if(!this.isDoorOpened && (this.elevatorPosition != this.nextPosition)) this.setNextPosition();
             }
         },
 
@@ -76,9 +76,6 @@ export const useElevatorStore = defineStore('elevator', {
             const candidates = this.getCandidates();
             if (candidates.length > 0) {
                 this.nextPosition = this.findClosestFloor(candidates);
-            } else {
-                this.switchDirection();
-                this.calculNextPosition();
             }
         },
 
@@ -92,22 +89,30 @@ export const useElevatorStore = defineStore('elevator', {
 
         getCandidates(): number[] {
             if (this.currentDirection === "up") {
-                return [...this.destinations, ...this.upClient].filter(
+                let candidate = [...this.destinations, ...this.upClient].filter(
                     (floor) => floor > this.elevatorPosition
                 );
-            } else if (this.currentDirection === "down") {
-                return [...this.destinations, ...this.downClient].filter(
+
+                if(candidate.length > 0) return candidate;
+                else this.currentDirection = "idle"
+            } 
+            
+            if (this.currentDirection === "down") {
+                let candidate = [...this.destinations, ...this.downClient].filter(
                     (floor) => floor < this.elevatorPosition
                 );
-            } else {
-                if(this.upClient.length > 0) {
+
+                if(candidate.length > 0) return candidate;
+                else this.currentDirection = "idle"
+            } 
+
+            if(this.upClient.length > 0) {
                     this.currentDirection = "up";
                     return this.upClient;
-                } else {
+            }else if(this.downClient.length > 0){
                     this.currentDirection = "down";
                     return this.downClient;
-                }
-            }
+            }else return [];
         },
 
         findClosestFloor(candidates: number[]): number {

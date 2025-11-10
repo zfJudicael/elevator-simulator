@@ -10,7 +10,7 @@
         >
             <motion.div 
                 class="door" 
-                :animate="useElevator.isDoorOpened ?  { width: '60%' } : { width: '1px' }"
+                :animate="useElevator.isDoorOpened ?  { width: '95%' } : { width: '1px' }"
                 :initial="{ width: '1px' }"
                 :transition="{ duration: 0.6 }"
             />
