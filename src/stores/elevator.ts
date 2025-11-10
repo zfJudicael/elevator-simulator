@@ -5,7 +5,6 @@ interface Elevator {
     floorCount: number;
     elevatorPosition: number;
     nextPosition: number | null;
-    lastPosition: number;
     currentDirection: TDirection;
     isDoorOpened: boolean;
     isMoving: boolean;
@@ -13,13 +12,13 @@ interface Elevator {
     downClient: number[];
     destinations: number[];
     clientsTransported: number;
+    totalTravel: number;
 }
 
 export const useElevatorStore = defineStore('elevator', {
     state: (): Elevator => ({
         floorCount: 8,
         elevatorPosition: 1,
-        lastPosition: 1,
         nextPosition: null,
         currentDirection: "idle",
         isDoorOpened: false,
@@ -28,6 +27,7 @@ export const useElevatorStore = defineStore('elevator', {
         downClient: [],
         destinations: [],
         clientsTransported: 0,
+        totalTravel: 0,
     }),
     actions: {
         addClient(floor: number, upDirection = true) {
@@ -127,12 +127,15 @@ export const useElevatorStore = defineStore('elevator', {
         },
 
         onMoving(position: number) { 
+            this.isMoving = true;
             if(position != this.elevatorPosition){
+                this.totalTravel++;
                 this.elevatorPosition = position;
-                this.isMoving = true;
                 if(position === this.nextPosition){
                     this.onArriveDestination();
                 }
+            } else if(position === this.nextPosition){
+                this.isMoving = false;
             }
         },
 
@@ -159,7 +162,6 @@ export const useElevatorStore = defineStore('elevator', {
                     (floor) => floor !== this.elevatorPosition
                 );
             }
-            this.lastPosition = this.elevatorPosition;
             this.isMoving = false;
             this.openDoor(closeAuto);
         },
