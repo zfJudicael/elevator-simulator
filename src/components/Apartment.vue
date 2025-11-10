@@ -2,7 +2,15 @@
     <div class="apartment">
         <template v-for="floor in elevator.floorCount">
             <div class="floor">
-                <p class="title">Floor {{ floor }}</p>
+                <p class="title">
+                    <template v-if="floor !== 1">
+                        <span>{{ floor - 1 }}</span>
+                        <sup class="">{{ (floor - 1) === 1 ? 'er' : 'ème' }}</sup> étage
+                    </template>
+                    <template v-else>
+                        Rez-de-chaussée
+                    </template>
+                </p>
                 <div class="updownButton">
                     <i :class="{
                             'pi pi-arrow-up btn' : true,
@@ -30,13 +38,11 @@ import Elevator from './Elevator.vue';
 
 const elevator = useElevatorStore();
 
-const isElevatorOnFloor = (floor: number)=>{
-    return elevator.elevatorPosition == floor
-}
 </script>
 
 <style lang="scss">
 .apartment{
+    width: 75%;
     display: flex;
     flex-direction: column-reverse;
     background-color: #F5F7FA;
