@@ -1,22 +1,8 @@
-import type { TDirection } from '@/model/Elevator'
+import type { IElevator } from '@/model/Elevator'
 import { defineStore } from 'pinia'
 
-interface Elevator {
-    floorCount: number;
-    elevatorPosition: number;
-    nextPosition: number | null;
-    currentDirection: TDirection;
-    isDoorOpened: boolean;
-    isMoving: boolean;
-    upClient: number[];
-    downClient: number[];
-    destinations: number[];
-    clientsTransported: number;
-    totalTravel: number;
-}
-
 export const useElevatorStore = defineStore('elevator', {
-    state: (): Elevator => ({
+    state: (): IElevator => ({
         floorCount: 8,
         elevatorPosition: 1,
         nextPosition: null,
@@ -140,42 +126,39 @@ export const useElevatorStore = defineStore('elevator', {
         },
 
         onArriveDestination() {
-            let closeAuto = true;
-            this.clientsTransported += this.destinations.filter(
-                (floor) => floor === this.elevatorPosition
-            ).length; 
-            this.destinations = this.destinations.filter(
-                (floor) => floor !== this.elevatorPosition
-            );
-            if (this.currentDirection === "up") {
-                if(this.upClient.includes(this.elevatorPosition)){
-                    closeAuto = false;
-                }
-                this.upClient = this.upClient.filter(
-                    (floor) => floor !== this.elevatorPosition
-                );
-            } else {
-                if(this.downClient.includes(this.elevatorPosition)){
-                    closeAuto = false;
-                }
-                this.downClient = this.downClient.filter(
-                    (floor) => floor !== this.elevatorPosition
-                );
-            }
             this.isMoving = false;
-            this.openDoor(closeAuto);
-        },
-        
-        openDoor(closeAuto: boolean) {
+
             setTimeout(() => {
                 this.isDoorOpened = true
+                let closeAuto = true;
+    
+                this.clientsTransported += this.destinations.filter(
+                    (floor) => floor === this.elevatorPosition
+                ).length; 
+                this.destinations = this.destinations.filter(
+                    (floor) => floor !== this.elevatorPosition
+                );
+    
+                if (this.currentDirection === "up") {
+                    if(this.upClient.includes(this.elevatorPosition)){
+                        closeAuto = false;
+                    }
+                    this.upClient = this.upClient.filter(
+                        (floor) => floor !== this.elevatorPosition
+                    );
+                } else {
+                    if(this.downClient.includes(this.elevatorPosition)){
+                        closeAuto = false;
+                    }
+                    this.downClient = this.downClient.filter(
+                        (floor) => floor !== this.elevatorPosition
+                    );
+                }
+    
+                if(closeAuto) {
+                    setTimeout(() => this.setNextPosition(), 3000);
+                }
             }, 1000);
-
-            if(closeAuto){
-                setTimeout(()=>{
-                    this.setNextPosition()
-                }, 3000)
-            }
         },
     },
 });
