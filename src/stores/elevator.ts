@@ -92,13 +92,16 @@ export const useElevatorStore = defineStore('elevator', {
                 else this.currentDirection = "idle"
             } 
 
-            if(this.upClient.length > 0) {
-                    this.currentDirection = "up";
-                    return this.upClient;
-            }else if(this.downClient.length > 0){
-                    this.currentDirection = "down";
-                    return this.downClient;
-            }else return [];
+            if(this.upClient.length !== 0 || this.downClient.length !== 0){
+                if(this.upClient.length > this.downClient.length) {
+                        this.currentDirection = "up";
+                        return this.upClient;
+                } else {
+                        this.currentDirection = "down";
+                        return this.downClient;
+                }
+            }
+            return [];
         },
 
         findClosestFloor(candidates: number[]): number {
