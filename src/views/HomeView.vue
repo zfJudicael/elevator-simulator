@@ -1,9 +1,17 @@
+<template>
+    <div class="home-view">
+        <Section1 />
+        <Section2 />
+    </div>
+</template>
+
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import Section1 from '@/components/home/Section-1.vue';
+import Section2 from '@/components/home/Section-2.vue';
 </script>
 
-<template>
-  <main>
-    <TheWelcome />
-  </main>
-</template>
+<style lang="scss" scoped>
+.home-view {
+    background-color: #eaf1ff;
+}
+</style>
