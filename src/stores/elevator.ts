@@ -80,7 +80,6 @@ export const useElevatorStore = defineStore('elevator', {
                 );
 
                 if(candidate.length > 0) return candidate;
-                else this.currentDirection = "idle"
             } 
             
             if (this.currentDirection === "down") {
@@ -89,7 +88,6 @@ export const useElevatorStore = defineStore('elevator', {
                 );
 
                 if(candidate.length > 0) return candidate;
-                else this.currentDirection = "idle"
             } 
 
             if(this.upClient.length !== 0 || this.downClient.length !== 0){
@@ -101,6 +99,7 @@ export const useElevatorStore = defineStore('elevator', {
                         return this.downClient;
                 }
             }
+            this.currentDirection = "idle"
             return [];
         },
 
@@ -108,11 +107,6 @@ export const useElevatorStore = defineStore('elevator', {
             return this.currentDirection === "up"
                 ? Math.min(...candidates)
                 : Math.max(...candidates);
-        },
-
-        switchDirection() {
-            this.currentDirection =
-                this.currentDirection === "up" || this.currentDirection === "idle" ? "down" : "up";
         },
 
         onMoving(position: number) { 
